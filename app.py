@@ -1,9 +1,9 @@
-from instrumentation import LangsmithSession
 from llama_index import StorageContext, load_index_from_storage
 from llama_index.evaluation import FaithfulnessEvaluator, RelevancyEvaluator
 from ragas.metrics import answer_relevancy, faithfulness
 
 import streamlit as st
+from instrumentation import LangsmithSession
 
 RAGAS_EVAL_MSG = "**Faithfulness:** {faithfulness:0.2f} **Answer Relevancy:** {answer_relevancy:0.2f} *(powered by [ragas](https://github.com/explodinggradients/ragas))*"  # noqa
 LLAMAINDEX_EVAL_MSG = (
@@ -27,11 +27,19 @@ with st.sidebar:
         "Want to learn more or contribute? [Check out the repo](https://github.com/jjmachan/llamachat)"
     )
 
+
+@st.cache_resource
+def load_index(path: str):
+    storage_context = StorageContext.from_defaults(persist_dir=path)
+    index = load_index_from_storage(storage_context)
+    chat_engine = index.as_chat_engine(chat_mode="condense_question")
+    service_context = index.service_context
+
+    return chat_engine, service_context
+
+
 # load llama index
-storage_context = StorageContext.from_defaults(persist_dir="../notebooks/storage")
-index = load_index_from_storage(storage_context)
-chat_engine = index.as_chat_engine(chat_mode="condense_question")
-service_context = index.service_context
+chat_engine, service_context = load_index("./notebooks/pycon23/storage")
 
 
 # Store LLM generated responses
