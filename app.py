@@ -14,7 +14,7 @@ LLAMAINDEX_EVAL_MSG = (
 LLAMA_INTRO_MSG = """\
 hey there 👋
 
-I'm llama, your go to for everything at this year's PyCon India Confrence. You can ask me everything from the schedule to the speakers to the sponsors. I'm still learning so please be patient with me. 
+I'm llama, your go to for everything at this year's [PyCon India Confrence](https://in.pycon.org/2023/). You can ask me everything about the sessions happening this weekend. I'm still learning so please be patient with me. 
 """
 
 
