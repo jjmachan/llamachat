@@ -1,3 +1,5 @@
+import asyncio
+
 from llama_index import StorageContext, load_index_from_storage
 from llama_index.evaluation import FaithfulnessEvaluator, RelevancyEvaluator
 from ragas.metrics import answer_relevancy, faithfulness
@@ -9,6 +11,20 @@ RAGAS_EVAL_MSG = "**Faithfulness:** {faithfulness:0.2f} **Answer Relevancy:** {a
 LLAMAINDEX_EVAL_MSG = (
     "**Faithfulness:** {faithfulness} **Answer Relevancy:** {relevancy}"
 )
+
+
+def get_or_create_eventloop():
+    try:
+        return asyncio.get_event_loop()
+    except RuntimeError as ex:
+        if "There is no current event loop in thread" in str(ex):
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            return asyncio.get_event_loop()
+
+
+loop = get_or_create_eventloop()
+asyncio.set_event_loop(loop)
 
 st.set_page_config(page_title="LlamaChat")
 st.title("LlamaChat")
