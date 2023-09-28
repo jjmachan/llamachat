@@ -59,7 +59,6 @@ if prompt := st.chat_input():
 if st.session_state.messages[-1]["role"] != "assistant":
     # start langsmith session
     assert prompt is not None
-    print(use_langsmith)
     session = LangsmithSession.start(prompt, st.session_state.messages, use_langsmith)
 
     # now start generating response
