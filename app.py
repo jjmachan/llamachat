@@ -11,6 +11,11 @@ RAGAS_EVAL_MSG = "**Faithfulness:** {faithfulness:0.2f} **Answer Relevancy:** {a
 LLAMAINDEX_EVAL_MSG = (
     "**Faithfulness:** {faithfulness} **Answer Relevancy:** {relevancy}"
 )
+LLAMA_INTRO_MSG = """\
+hey there 👋
+
+I'm llama, your go to for everything at this year's PyCon India Confrence. You can ask me everything from the schedule to the speakers to the sponsors. I'm still learning so please be patient with me. 
+"""
 
 
 def get_or_create_eventloop():
@@ -29,11 +34,11 @@ asyncio.set_event_loop(loop)
 st.set_page_config(page_title="LlamaChat")
 st.title("LlamaChat")
 
+use_langsmith = True
 with st.sidebar:
     use_ragas = st.toggle("ragas eval")
     use_llamaindex_eval = st.toggle("llamaindex eval")
     use_feedback = st.toggle("feedback", value=True)
-    use_langsmith = st.toggle("langsmith tracing", value=True)
 
     # info
     st.markdown(
@@ -60,9 +65,7 @@ chat_engine, service_context = load_index("./notebooks/pycon23/storage")
 
 # Store LLM generated responses
 if "messages" not in st.session_state.keys():
-    st.session_state.messages = [
-        {"role": "assistant", "content": "How may I help you?"},
-    ]
+    st.session_state.messages = [{"role": "assistant", "content": LLAMA_INTRO_MSG}]
 
 
 # Display chat messages
