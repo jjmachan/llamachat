@@ -12,6 +12,7 @@ LLAMAINDEX_EVAL_MSG = (
 
 st.set_page_config(page_title="LlamaChat")
 st.title("LlamaChat")
+
 with st.sidebar:
     use_ragas = st.toggle("ragas eval")
     use_llamaindex_eval = st.toggle("llamaindex eval")
@@ -58,7 +59,8 @@ if prompt := st.chat_input():
 if st.session_state.messages[-1]["role"] != "assistant":
     # start langsmith session
     assert prompt is not None
-    session = LangsmithSession.start(prompt, st.session_state.messages)
+    print(use_langsmith)
+    session = LangsmithSession.start(prompt, st.session_state.messages, use_langsmith)
 
     # now start generating response
     with st.chat_message("assistant", avatar="🦙"):
@@ -91,12 +93,12 @@ if st.session_state.messages[-1]["role"] != "assistant":
                 relevancy = answer_relevancy.score_single(
                     {"question": prompt, "answer": full_response}
                 )
-                st.success(
-                    RAGAS_EVAL_MSG.format(
-                        faithfulness=faithfulness, answer_relevancy=relevancy
-                    )
+            st.success(
+                RAGAS_EVAL_MSG.format(
+                    faithfulness=faithfulness, answer_relevancy=relevancy
                 )
-                session.ragas_scores(faithfulness, relevancy)
+            )
+            session.ragas_scores(faithfulness, relevancy)
 
         if use_llamaindex_eval:
             with st.status("running llamaindex evaluation"):
@@ -106,13 +108,13 @@ if st.session_state.messages[-1]["role"] != "assistant":
                     response=streaming_response
                 )
 
-                st.success(
-                    LLAMAINDEX_EVAL_MSG.format(
-                        faithfulness="Pass" if faithfulness_resp.passing else "Fail",
-                        relevancy="Pass",
-                    )
+            st.success(
+                LLAMAINDEX_EVAL_MSG.format(
+                    faithfulness="Pass" if faithfulness_resp.passing else "Fail",
+                    relevancy="Pass",
                 )
-                session.llamaindex_scores(faithfulness_resp.passing, "Pass")
+            )
+            session.llamaindex_scores(faithfulness_resp.passing, "Pass")
 
         # get user feedback
         if use_feedback:

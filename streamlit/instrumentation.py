@@ -14,9 +14,10 @@ os.environ["LANGCHAIN_PROJECT"] = "pycon23"
 class LangsmithSession:
     run: RunTree
     client: Client
+    ennabled: bool = True
 
     @classmethod
-    def start(cls, query: str, history: list[dict[str, str]]):
+    def start(cls, query: str, history: list[dict[str, str]], ennabled: bool = True):
         run = RunTree(
             name="query",
             run_type="chain",
@@ -24,12 +25,13 @@ class LangsmithSession:
             serialized={},
         )
         client = Client()
-        return cls(run, client)
+        return cls(run, client, ennabled)
 
     def stop(self, response: str):
         self.run.end(outputs={"response": response})
-        res = self.run.post(exclude_child_runs=False)
-        logging.debug(res)
+        if self.ennabled:
+            res = self.run.post(exclude_child_runs=False)
+            logging.debug(res)
 
     def retriever_start(self, query: str):
         self.retriever_run = self.run.create_child(
@@ -47,13 +49,13 @@ class LangsmithSession:
             self.run.id,
             "ragas_faithfulnes",
             score=faithfulnes,
-            feedback_source_type="MODEL",
+            feedback_source_type="model",
         )
         self.client.create_feedback(
             self.run.id,
             "ragas_relevancy",
             score=relevancy,
-            feedback_source_type="MODEL",
+            feedback_source_type="model",
         )
 
     def llamaindex_scores(self, faithfulnes: str, relevancy: str):
@@ -61,13 +63,13 @@ class LangsmithSession:
             self.run.id,
             "llamaindex_faithfulnes",
             value=faithfulnes,
-            feedback_source_type="MODEL",
+            feedback_source_type="model",
         )
         self.client.create_feedback(
             self.run.id,
             "llamaindex_relevancy",
             value=relevancy,
-            feedback_source_type="MODEL",
+            feedback_source_type="model",
         )
 
     def feedback(self, liked: bool):
