@@ -13,6 +13,11 @@ LLAMA_INTRO_MSG = """\
 hey there 👋
 
 I'm llama, your go to for everything at this year's [PyCon India Conference](https://in.pycon.org/2023/). You can ask me everything about the sessions happening this weekend. I'm still learning so please be patient with me. 
+
+Here are some questions I have helped others with:
+- What is the session on llamaindex about?
+- Is there a session on mojo?
+- list the sessions where I can learn about telemetry
 """
 
 
