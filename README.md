@@ -3,5 +3,8 @@
   <i>Streamlit UI build for <a href="https://gpt-index.readthedocs.io/">LlamaIndex</a> for Pycon India 23</i>
 </p>
 
-## Features
-- learn more about 
+Try it out with 
+```
+pip install llamachat
+llamachat <path-to-index-storage>
+```
