@@ -1,2 +1,5 @@
 **/.ipynb_checkpoints
 **/__pycache__
+
+src/llamachat.egg-info
+src/llamachat/_version.py
