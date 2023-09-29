@@ -1,11 +1,9 @@
 import asyncio
 
+import streamlit as st
 from llama_index import StorageContext, load_index_from_storage
 from llama_index.evaluation import FaithfulnessEvaluator, RelevancyEvaluator
 from ragas.metrics import answer_relevancy, faithfulness
-
-import streamlit as st
-from instrumentation import LangsmithSession
 
 RAGAS_EVAL_MSG = "**Faithfulness:** {faithfulness:0.2f} **Answer Relevancy:** {answer_relevancy:0.2f} *(powered by [ragas](https://github.com/explodinggradients/ragas))*"  # noqa
 LLAMAINDEX_EVAL_MSG = (
@@ -84,16 +82,12 @@ if prompt := st.chat_input():
 
 # Generate a new response if last message is not from assistant
 if st.session_state.messages[-1]["role"] != "assistant":
-    # start langsmith session
     assert prompt is not None
-    session = LangsmithSession.start(prompt, st.session_state.messages, use_langsmith)
 
     # now start generating response
     with st.chat_message("assistant", avatar="🦙"):
         msg_placeholder = st.empty()
         full_response = ""
-
-        session.retriever_start(prompt)
 
         # stream response
         streaming_response = chat_engine.stream_chat(prompt)
@@ -104,7 +98,6 @@ if st.session_state.messages[-1]["role"] != "assistant":
 
         # retriever_stop
         context_txts = [n.text for n in streaming_response.source_nodes]
-        session.retriever_stop(context_txts)
 
         # feedback and evaluation
         if use_ragas:
@@ -124,7 +117,6 @@ if st.session_state.messages[-1]["role"] != "assistant":
                     faithfulness=faithfulness, answer_relevancy=relevancy
                 )
             )
-            session.ragas_scores(faithfulness, relevancy)
 
         if use_llamaindex_eval:
             with st.status("running llamaindex evaluation"):
@@ -140,7 +132,6 @@ if st.session_state.messages[-1]["role"] != "assistant":
                     relevancy="Pass",
                 )
             )
-            session.llamaindex_scores(faithfulness_resp.passing, "Pass")
 
         # get user feedback
         if use_feedback:
@@ -156,4 +147,3 @@ if st.session_state.messages[-1]["role"] != "assistant":
 
     message = {"role": "assistant", "content": full_response}
     st.session_state.messages.append(message)
-    session.stop(full_response)
